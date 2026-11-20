@@ -10,9 +10,9 @@ from matplotlib.widgets import Slider, Button
 from algo import bat_algorithm_steps
 
 LINKS = np.array([2.0, 1.6, 1.2, 0.9, 0.6])  # link lengths, total reach 6.3
-N_BATS, T_MAX, SIGMA, ALPHA = 20, 30, 0.1, 0.97  # book defaults except n and t_max
+N_BATS, T_MAX, SIGMA, ALPHA = 20, 50, 0.1, 0.97  # book defaults except n and t_max
 OBST_R = 0.8
-STEP_PER_TICK = 1
+STEP_PER_TICK = 3
 ANIMATION_STEPS = 8
 
 
@@ -101,11 +101,25 @@ def bat_arm_gui():
         ]
         (art["best"],) = ax.plot([], [], "o-", color="k", lw=3, ms=6, zorder=4)
         (art["hand"],) = ax.plot([], [], "o", color="m", ms=10, zorder=6)
-        h = np.maximum([fr["f"] for fr in st["trace"]], 1e-300)
         ax_c.clear()
-        ax_c.plot(h, color="tab:blue")
-        (art["marker"],) = ax_c.plot([0], [h[0]], "ro")
+
+        # Create the convergence line.
+        (art["convergence"],) = ax_c.plot(
+            [], [],
+            color="tab:blue",
+            lw=2,
+            marker=".",
+            markersize=4,
+        )
+
+        # Create the red marker indicating the current iteration.
+        (art["marker"],) = ax_c.plot([], [], "ro", zorder=5)
+
+        # Use logarithmic scale to visualize large differences in fitness.
         ax_c.set_yscale("log")
+
+        ax_c.set_xlim(0, T_MAX)
+
         ax_c.set_xlabel("iteration")
         ax_c.set_ylabel("f_best (cost)")
         ax_c.set_title("convergence")
@@ -128,7 +142,23 @@ def bat_arm_gui():
         pb = joints(best_pose)
         art["best"].set_data(pb[:, 0], pb[:, 1])
         art["hand"].set_data([pb[-1, 0]], [pb[-1, 1]])
+        # Extract the best fitness values calculated so far.
+        iterations = np.arange(len(st["trace"]))
+
+        costs = np.maximum(
+            [frame["f"] for frame in st["trace"]],
+            1e-300,
+        )
+
+        # Update the convergence curve.
+        art["convergence"].set_data(iterations, costs)
+
+        # Update the red marker to indicate the current iteration.
         art["marker"].set_data([t], [max(fr["f"], 1e-300)])
+
+        # Automatically adjust the Y-axis to fit the updated curve.
+        ax_c.relim()
+        ax_c.autoscale_view(scalex=False, scaley=True)
         miss = np.linalg.norm(pb[-1] - st["target"])
         art["text"].set_text(
             f"iteration     : {t}\nhand-target gap: {miss:.4f}\ncost (f_best)  : {fr['f']:.3e}\n"
