@@ -13,7 +13,7 @@ LINKS = np.array([2.0, 1.6, 1.2, 0.9, 0.6])  # link lengths, total reach 6.3
 N_BATS, T_MAX, SIGMA, ALPHA = 20, 50, 0.1, 0.97  # book defaults except n and t_max
 OBST_R = 0.8
 STEP_PER_TICK = 3
-ANIMATION_STEPS = 8
+ANIMATION_STEPS = 30
 
 
 def joints(theta):
@@ -193,7 +193,6 @@ def bat_arm_gui():
             t_max=T_MAX,
             alpha=ALPHA,
             sigma=SIGMA,
-            variant="book",
             seed=st["runs"],
         )
 
