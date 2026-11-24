@@ -24,6 +24,9 @@ In this project, the algorithm is applied to a robotic arm inverse kinematics pr
 
 The simulation provides a visual representation of the optimization process, making it easier to understand how the population evolves over successive iterations.
 
+## Example of the GUI:
+![App Screenshot](Example.png)
+
 ## Features
 
 - **Bat Algorithm implementation:** A customizable implementation of the optimization algorithm.
